@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    body {
+        background: url(http://www.planwallpaper.com/static/images/colorful-triangles-background_yB0qTG6.jpg);
+        background-size: cover;
+        font-family: sans-serif;
+    }
+    
+    .container {
+        background: #FFF;
+        margin-top: 40px;
+        min-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    section {
+        visiblity: hidden;
+        -webkit-transition: all 1200ms ease;
+        opacity: 0;
+        height: 0;
+    }
+    
+    section.active-section {
+        display: block;
+        opacity: 1;
+        visiblity: visible;
+        height: auto;
+    }
+    
+    .activity-text {
+        display: block;
+        margin: 2em auto;
+        border: solid;
+        padding: 10px;
+        font-size: 1.2em;
+        line-height: 1.5em;
+    }
+    
+    span.word {
+        cursor: pointer;
+        position: relative;
+        color: #46c;
+        font-weight: 600;
+    }
+    
+    #myModal h1.active-word {
+        text-align: center;
+    }
+    
+    #myModal .help {
+        display: none;
+        border: solid #999;
+        padding: 30px;
+        margin: 0 auto;
+        width: 80%;
+    }
+    
+    .help:before {
+        content: "?";
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border: solid;
+        border-radius: 100%;
+        background: #337ab7;
+        color: #FFF;
+        text-aligN: center;
+        font-size: 3em;
+        top: 60px;
+        left: 50px;
+        font-family: sans-serif;
+    }
+    
+    #myModal .modal-header {
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        background: #fbc429;
+    }
+    
+    #answers {
+        display: none;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script>
+    $(document).ready(function() {
+            var correctWords = ["Bore", "y", "nos Fercher", "o'r gloch", "hwyl"];
+
+            $('.word').click(function() {
+                $(this).addClass('active');
+            })
+
+            $('#myModal').on('show.bs.modal', function(e) {
+                var thisWord = $(e.relatedTarget);
+
+                var word = $(thisWord).attr('data-title');
+                var help = $(thisWord).attr('data-help-content');;
+                $('#myModal h1.active-word').html(word);
+                $('#myModal .help').html(help);
+
+                $('#helpBtn').click(function() {
+                    $('.help').show();
+                    $(thisWord).attr('data-help', 1);
+                    //deduct points;
+                })
+
+                $('h1.active-word').focusout(function() {
+                    var newWord = $(this).text().trim().replace(/\s\s+/g, ' ');
+                    $('.word.active').text(newWord);
+                    $('.word.active').attr('data-title', newWord);
+                })
+
+                $('#myModal').on('hidden.bs.modal', function(e) {
+                    $('.word').removeClass('active');
+                    $('.help').hide();
+                })
+            })
+
+            $('#checkBtn').click(function() {
+                var score = 0;
+                $('.word').each(function(index, value) {
+
+                    var guess = $(value).text();
+                    var answer = correctWords[index];
+                    var help = $(value).attr('data-help');
+                    console.log(guess, answer, help);
+
+                    if (guess == answer && help == 0) {
+                        score += 2;
+                    } else if (guess == answer && help == 1) {
+                        score++;
+                    }
+                })
+                $('#score').text('Your score: ' + score + ' out of a possible ' + $('.word').length * 2);
+            })
+
+
+
+            $('#answersBtn').click(function() {
+                $('#answers').toggle();
+                $('#answers').is(":visible") ? $(this).text('Hide Answers') : $(this).text('Show Answers');
+
+            })
+
+
+        }) // end (doc).ready
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="col-sm-offset-3 col-sm-6">
+            <section class="active-section">
+                <div class="activity-text">
+                    <p><span data-toggle="modal" data-target="#myModal" data-title="bore" data-help="0" data-help-content="This is a punctuation mistake. Names and starts of sentences must have what?" class="word">bore</span> da.
+                        <br> Bydd <span data-toggle="modal" data-target="#myModal" data-title="yr" data-help="0" data-help-content="Remember that “y” / “yr” and “’r” all mean “the” in Welsh. Remember also that you use “y” before a consonant and “yr” before a vowel (a e i o u w y)" class="word">yr</span> cwrs cyfrifiaduron yn dechrau am hanner awr wedi pump <span data-toggle="modal" data-target="#myModal" data-title="nos Mercher" data-help="0" data-help-content="“nos” is a feminine word. Therefore the days of the week mutate after “nos” e.g. dydd Gwener > nos Wener" class="word">nos Mercher</span>. Roedd yr hysbyseb yn dweud pump <span data-toggle="modal" data-target="#myModal" data-title="o gloch" data-help="0" data-help-content="You know this! Think about the spelling!" class="word">o gloch</span>.
+                        <br> Pob <span data-toggle="modal" data-target="#myModal" data-title="hywl" data-help="0" data-help-content="“wy” and “yw” often cause a problem. What’s gone wrong here?" class="word">hywl</span>.
+                        <br> Diolch yn fawr.
+                        <br> Pete Evans
+                    </p>
+                </div>
+                <div class="activity-btn">
+                    <h4 id="score"></h4>
+                    <button id="checkBtn" class="btn btn-primary">Check</button>
+                    <button id="answersBtn" class="btn btn-primary">Show Answers</button>
+                    <br>
+                    <br>
+                    <table id="answers" class="table table-bordered">
+                        <tr>
+                            <th colspan="5">Answers:</th>
+                        </tr>
+                        <tr class="text-center">
+                            <td>Bore</td>
+                            <td>y</td>
+                            <td><a href="#" data-toggle="modal" data-target="#answersInfo1">nos Fercher</a></td>
+                            <td><a href="#" data-toggle="modal" data-target="#answersInfo2">o'r gloch</a></td>
+                            <td>hwyl</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- end container -->
+    <!-- Modal word pop -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <h1 class="active-word" contenteditable="true"></h1>
+                    <div class="help"></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="helpBtn" type="button" class="btn btn-primary">Help</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- answers info modal -->
+    <div id="answersInfo1" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h1 class="modal-title">nos Ferchar</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Tuesday is dydd Mawrth but Tuesday night is nos Fawrth. There’s a <strong>SOFT MUTATION</strong>.</p>
+                    <p>e.g. dydd Mercher but it’s nos Fercher / dydd Llun but it’s nos Lun</p>
+                    <p>Why?</p>
+                    <p><strong>Answer:</strong> There’s always a mutation after “nos” because it’s a feminine word.</p>
+                    <h2 class="text-center">Grid treiglad meddal</h2>
+                    <table class="table table-bordered text-center">
+                        <tr>
+                            <td>p</td>
+                            <td>t</td>
+                            <td>c</td>
+                            <td>b</td>
+                            <td>g</td>
+                            <td>d</td>
+                            <td>m</td>
+                            <td>ll</td>
+                            <td>rh</td>
+                        </tr>
+                        <tr>
+                            <td>b</td>
+                            <td>d</td>
+                            <td>g</td>
+                            <td>f</td>
+                            <td>-</td>
+                            <td>dd</td>
+                            <td>f</td>
+                            <td>l</td>
+                            <td>r</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="answersInfo2" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h1 class="modal-title">Y Cloc</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Students often make mistakes when using the time. Learn the correct spellings now so that you can avoid any problems in the future.
+                        <p>
+                            <ul>
+                                <li>____ o’r gloch = ____ o’clock (Remember the apostrophe)</li>
+                                <li>hanner awr wedi ____ = half past ___ (Remember there is a double "n")</li>
+                                <li>chwarter wedi / chwarter i = quarter past / quarter to (Remember the “r” in the middle of the word)</li>
+                            </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
